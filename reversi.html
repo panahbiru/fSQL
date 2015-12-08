@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+		<title>My Test</title>
+		<style>
+			#c
+			{
+				background-color: #0BA31C;
+			}
+		</style>
+		<script type="text/javascript">
+		
+			var gReversiCanvas;
+			var gReversiContext;
+			var gCells;
+			var gPlayerTurn;
+			
+			var STATE = {
+			  EMPTY : {value: 0, name: "Empty", color: "#0BA31C"}, 
+			  BLACK: {value: 1, name: "Black", color: "#000000"}, 
+			  WHITE : {value: -1, name: "White", color: "#FFFFFF"}
+			};
+			
+			var DIRECTIONS = [
+			  {rowDelta: -1, colDelta: -1},
+			  {rowDelta: -1, colDelta: 0},
+			  {rowDelta: -1, colDelta: 1},
+			  {rowDelta: 0, colDelta: -1},
+			  {rowDelta: 0, colDelta: 1},
+			  {rowDelta: 1, colDelta: -1},
+			  {rowDelta: 1, colDelta: 0},
+			  {rowDelta: 1, colDelta: 1}
+			];
+			
+			var PLAYERS = {
+			  USER : {score: 2, color: STATE.BLACK},
+			  COMPUTER: {score: 2, color: STATE.WHITE}
+			};
+
+			function Cell(row, column) {
+				this.row = row;
+				this.column = column;
+				this.state = STATE.EMPTY;
+			}
+			
+			function drawCell(cell)
+			{
+				var x = 0.5 + cell.column * 51 + 25;
+				var y = 0.5 + cell.row * 51 + 25;
+				gReversiContext.beginPath();
+				gReversiContext.strokeStyle = "#000000";
+				gReversiContext.arc(x, y, 23, 0, Math.PI * 2, false);
+				gReversiContext.fillStyle = cell.state.color;
+				gReversiContext.fill();
+				gReversiContext.closePath();
+				gReversiContext.stroke();
+			}
+			
+			function lineFlipCount(cell, color, rowDelta, colDelta)
+			{
+				var current;
+				var currentState;
+				var stopCol = colDelta > 0 ? 8 : -1;
+				var stopRow = rowDelta > 0 ? 8 : -1;
+				var colorValue = color.value;
+				var oppositeColor = -colorValue;
+				var oppositesFound = 0;
+				
+				for(var row = cell.row + rowDelta, col = cell.column + colDelta;
+					row != stopRow && col != stopCol;
+					row += rowDelta, col += colDelta)
+				{
+					current = gCells[row][col];
+					currentState = current.state;
+					if(currentState.value == oppositeColor)
+						oppositesFound++;
+					else if(currentState.value == colorValue)
+						return oppositesFound;
+					else
+						break;  // empty cell
+				}
+				
+				return 0;
+			}
+			
+			function flipLine(cell, color, rowDelta, colDelta)
+			{
+				flipLineHelper(cell.row + rowDelta, cell.column + colDelta, color, rowDelta, colDelta);
+			}
+			
+			function flipLineHelper(row, col, color, rowDelta, colDelta)
+			{
+				var current;
+				var stopCol = colDelta > 0 ? 8 : -1;
+				var stopRow = rowDelta > 0 ? 8 : -1;
+				var oppositeColor = -color.value;
+				
+				if(row != stopRow && col != stopCol)
+				{
+					current = gCells[row][col];
+					if(current.state.value == oppositeColor)
+					{
+						current.state = color;
+						drawCell(current);
+						window.setTimeout(flipLineHelper, 75, row + rowDelta, col + colDelta, color, rowDelta, colDelta);
+						//window.setTimeout(function() { drawCell(current); }, 1000);
+						return;
+					}
+				}
+			}
+			
+			function flipAdjacent(cell, color)
+			{
+				flipAdjacentHelper(cell, color, 0);
+			}
+			
+			function flipAdjacentHelper(cell, color, dirIndex)
+			{
+				var cellRow = cell.row;
+				var cellCol = cell.column;
+				
+				if(dirIndex < DIRECTIONS.length)
+				{
+					var direction = DIRECTIONS[dirIndex];
+						
+					var lineFlipped = lineFlipCount(cell, color, direction.rowDelta, direction.colDelta);
+					if(lineFlipped != 0)
+					{
+						flipLine(cell, color, direction.rowDelta, direction.colDelta);
+					}
+					
+					window.setTimeout(flipAdjacentHelper, 75, cell, color, dirIndex + 1);
+				}
+				else
+					switchTurns();
+			}
+			
+			function flipCount(cell, color)
+			{
+				var currentFlipped = 0;
+				
+				for(var d = 0; d < DIRECTIONS.length; d++)
+				{
+					var direction = DIRECTIONS[d];
+					
+					currentFlipped += lineFlipCount(cell, color, direction.rowDelta, direction.colDelta);
+				}
+				
+				return currentFlipped;
+
+			}
+			
+			function switchTurns()
+			{
+				var playerScoreEle = document.getElementById(PLAYERS.USER.color.name + "_score");
+				var opponentScoreEle = document.getElementById(PLAYERS.COMPUTER.color.name + "_score");
+				
+				var userScore = PLAYERS.USER.score;
+				var computerScore = PLAYERS.COMPUTER.score;
+				
+				playerScoreEle.innerText = userScore;
+				opponentScoreEle.innerText = computerScore;
+				
+				if( userScore != 0 && computerScore != 0 && userScore + computerScore != 64)
+				{
+					gPlayerTurn = !gPlayerTurn;
+					if(gPlayerTurn == false)
+					{
+						window.setTimeout(opponentTurn, 75);
+					}
+				}
+				else
+				{
+					var text;
+					if(userScore == computerScore)
+						text = "Tie!";
+					else if(userScore > computerScore || computerScore == 0)
+						text = "You Win!";
+					else
+						text = "You Lose!";
+					
+					gReversiContext.fillStyle= "#0BA31C";
+					gReversiContext.fillRect(0, 153, 410, 102);
+					gReversiContext.strokeRect(0, 153, 410, 102);
+					gReversiContext.font = "bold 32px sans-serif";
+					gReversiContext.fillStyle= "#FFFFFF";
+					gReversiContext.textAlign= "center";
+					gReversiContext.textBaseline = "middle";
+					gReversiContext.fillText(text, 204, 204);
+				}
+			}
+			
+			function opponentTurn()
+			{
+				var cell;
+				var currentFlipped;
+				var maxFlipped = 0;
+				var maxCell;
+				var computerColor = PLAYERS.COMPUTER.color;
+				
+				for(var row = 0; row < 8; row++)
+				{
+					for(var col = 0; col < 8; col++)
+					{
+						cell = gCells[row][col];
+						if(cell.state == STATE.EMPTY)
+						{
+							currentFlipped = flipCount(cell, computerColor);
+							
+							if(currentFlipped > maxFlipped)
+							{
+								maxFlipped = currentFlipped;
+								maxCell = cell;
+							}
+						}
+					}
+				}
+				
+				// if the computer can move
+				if(maxCell != undefined)
+				{
+					maxCell.state = computerColor;
+					drawCell(maxCell);
+					PLAYERS.COMPUTER.score += maxFlipped + 1;
+					PLAYERS.USER.score -= maxFlipped;
+					flipAdjacent(maxCell, computerColor);
+				}
+				else // computer can't move
+				{
+					switchTurns();
+				}
+			}
+			
+			function reversiOnClick(e)
+			{
+				if(gPlayerTurn == true)
+				{
+					var x;
+					var y;
+					if (e.pageX != undefined && e.pageY != undefined) {
+						x = e.pageX;
+						y = e.pageY;
+					}
+					else {
+						x = e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;
+						y = e.clientY + document.body.scrollTop + document.documentElement.scrollTop;
+					}
+					x -= gReversiCanvas.offsetLeft;
+					y -= gReversiCanvas.offsetTop;
+					x = Math.min(x, gReversiCanvas.width);
+					y = Math.min(y, gReversiCanvas.height);
+					var row = Math.floor(y/51);
+					var col = Math.floor(x/51);
+					var cell = gCells[row][col];
+					if(cell.state == STATE.EMPTY)
+					{
+						var playerColor = PLAYERS.USER.color;
+						var flippable = flipCount(cell, playerColor);
+						if(flippable != 0)
+						{
+							cell.state = playerColor;
+							drawCell(cell);
+							PLAYERS.USER.score += flippable + 1;
+							PLAYERS.COMPUTER.score -= flippable;
+							flipAdjacent(cell, playerColor);
+						}
+					}
+				}
+			}
+			
+			function addPiece(row, col, color)
+			{
+				var cell = gCells[row][col];
+				cell.state = color;
+				drawCell(cell);
+			}
+			
+			function drawBoard()
+			{
+				for(var x = 0.5; x < 409; x += 51)
+				{
+					gReversiContext.moveTo(x, 0);
+					gReversiContext.lineTo(x, 409);
+				}
+				for(var y = 0.5; y < 409; y += 51)
+				{
+					gReversiContext.moveTo(0, y);
+					gReversiContext.lineTo(409, y);
+				}
+				gReversiContext.strokeStyle = "#000000";
+				gReversiContext.stroke();
+			}
+			
+			window.onload = function()
+			{
+				gReversiCanvas = document.getElementById("c");
+				gReversiContext = gReversiCanvas.getContext("2d");
+				
+				gCells = new Array(8);
+				for(var row = 0; row < 8; row++)
+				{
+					gCells[row] = new Array(8);
+					for(var col = 0; col < 8; col++)
+					{
+						gCells[row][col] = new Cell(row, col);
+					}
+				}
+				
+				drawBoard();
+				
+				addPiece(3, 3, STATE.BLACK);
+				addPiece(3, 4, STATE.WHITE);
+				addPiece(4, 3, STATE.WHITE);
+				addPiece(4, 4, STATE.BLACK);
+				
+				gReversiContext.stroke();
+				
+				gReversiCanvas.addEventListener("click", reversiOnClick, false);
+				gPlayerTurn = true;
+			}
+		</script>
+	</head>
+	<body>
+		<div>
+			<canvas id="c" width="409" height="409"></canvas>
+		</div>
+		<div style="width: 410px">
+			<div style="float: left">
+				<p id="Black_score">2</p>
+			</div>
+			<div style="float: right">
+				<p id="White_score">2</p>
+			</div>
+		</div>
+	</body>
+</html>
