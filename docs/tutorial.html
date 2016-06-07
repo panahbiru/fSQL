@@ -1,0 +1,133 @@
+
+<h1>PHP fSQL Tutorial</h1>
+
+<p>This tutorial is designed to give a brief overview of the PHP fSQL API since version 1.2.
+The syntax and function of the SQL queries understood by fSQL will be
+addressed in another tutorial.</p>
+
+<h2>I. The Basics</h2>
+
+<p>Every script that wishes to load fSQL needs to only include one file, the fSQL.php
+located in the distribution.  If fSQL.php is in the same directory as the script using it,
+this is all you need:</p>
+
+<pre><code>require_once("fSQL.php");</code></pre>
+
+<p>Once the file is included, there is only one class you need for all of your SQL needs:
+fSQLEnvironment.  This contains information on the different databases in the program
+and their location on the file system.  fSQLEnvironment is a simple API that is very similar to the PHP mysql
+API in almost every way.  For example, fSQLEnvironment's fetch_assoc() is modeled directly
+after mysql_fetch_assoc() so if you're having trouble understanding fSQL's documentation,
+the PHP mysql API could also help you understand what each function does.</p>
+
+<p>To create a new fSQLEnvironment class, it has a simple constructor with no parameters:</p>
+<pre><code>$fsql = new fSQLEnvironment;</code></pre>
+
+
+<h2>II. Defining Databases</h2>
+
+<p>Databases in fSQL are directories in the file system with an associated name
+given to them.  To define one:</p>
+
+<pre><code>$fsql->define_db("mydb", "/path/to/db");</code></pre>
+
+<p>The first parameter is the database name and the second is the path to that database.
+This tells the environment that the database to be called "mydb" will be
+located in the directory /path/to/db on the file system.  In other words,
+all table information and data for "mydb" should be loaded from and stored to
+the directory /path/to/db.  If the supplied path does not exist, fSQL will attempt
+to create it and set the appropriate permissions.</p>
+
+<p>As of PHP fSQL v1.2, fSQL allows you have multiple databases defined for
+fSQL.  For example, one could define several databases like so:</p>
+
+<pre><code>$fsql->define_db("db1", "/path/to/db1");
+$fsql->define_db("db2", "/path/to/db2");
+$fsql->define_db("db3", "/path/to/db3");</code></pre>
+
+<p>To select which database is to be the default when using queries and other function
+calls, use the select_db() function:</p>
+
+<pre><code>$fsql->select_db("db2");</code></pre>
+
+<p>This function is the equivalent to the "USE `db2`" query.  You should always
+select a default database before using any other functions in fSQLEnvironment.</p>
+
+<h2>III. Data Definition and Manipulation</h2>
+
+<p>From here on out, the most important method for dealing with the databases'
+data is the query() method.  The query method takes one parameter and that is the string
+fSQL query to execute.  The simplest form is data definition and manipulation
+performs just the query and returns either a true value on sucess or a false
+value on failure.</p>
+
+<pre><code>$fsql->query("CREATE TABLE example(
+   id INT NOT NULL AUTO_INCREMENT,
+   name VARCHAR(30), 
+   age INT,
+   PRIMARY KEY(id)
+)") or die($fsql->error());</code></pre>
+
+<p>The other types of queries worth mentioning: data manipulation (like INSERT, UPDATE, etc).
+On these queries, the method affected_rows() returns the number of rows added or modified
+by the last data manipulation query.  For example:</p>
+
+<pre><code>$fsql->query("DELETE FROM example WHERE id &lt; 5")
+  or die("DELETE failed: ".$fsql->error());
+echo "Deleted Rows: ".$fsql->affected_rows();</code></pre>
+
+<h2>IV. Data Selection</h2>
+
+<p>Executing data retrieval queries like SELECT are also performed using the query() method.
+Except on data retrieval queries, the query method returns a handle to a result set
+which can be iterated through row by row using the fetch methods.  Below we see an example.</p>
+
+<pre><code>$results = $fsql->query("SELECT id, name FROM example WHERE age > 30")
+  or die("SELECT failed: ".$fsql->error());
+while($row = $fsql->fetch_array($results))
+{
+	echo $row['id']." ".$row['name']."\r\n";
+}
+$fsql->free_result($results);</code></pre>
+
+<p>fetch_array($results) returns the next row in the result set until the last row
+has passed and then it returns NULL to stop the loop.<br /><br />
+There are several ways to iterate through a result set:</p>
+<ol>
+	<li>
+		Return the row as an associative array using the names/aliases of the columns as the row's keys:<br/>
+		<ul>
+			<li>$fsql->fetch_array($results)</li>
+			<li>$fsql->fetch_array($results, FSQL_ASSOC)</li>
+			<li>$fsql->fetch_assoc($results)</li>
+		</ul>
+	</li>
+	<li>
+		Returns the row as a normal array with integer indexes:<br/>
+		<ul>
+			<li>$fsql->fetch_row($results)</li>
+			<li>$fsql->fetch_array($results, FSQL_NUM)</li>
+		</ul>
+	</li>
+	<li>
+		Returns the row with both column name keys and integer keys:<br/>
+		<ul>
+			<li>$fsql->fetch_both($results)</li>
+			<li>$fsql->fetch_array($results, FSQL_BOTH)</li>
+		</ul>
+	</li>
+	<li>
+		Returns the row as "class-less object" using the names/aliases of the columns as the object's member variables:<br/>
+		<ul>
+			<li>$fsql->fetch_object($results)</li>
+		</ul>
+	</li>
+</ol>
+
+<p>Other result set methods of interest:</p>
+<ul>
+	<li>num_rows($results) - Returns the number of rows in the result set</li>
+	<li>num_fields($results) - Returns the number of columns in the result set</li>
+	<li>data_seek($results, $n) - Sets the internal cursor of the result set so that the next fetch method returns the nth row of the result set.</li>
+	<li>free_result($results) - Frees the result set and any memory it used</li>
+</ul>

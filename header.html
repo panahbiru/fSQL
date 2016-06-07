@@ -1,0 +1,69 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title><?php echo $title; ?></title>
+  <meta name="Author" content="Steve Buberl, sbuberl@gmail.com" />
+  <meta name="Description" content="Home of Flat-File SQL" />
+  <meta name="Copyright" content="Copyright (C) 2006-2016, Steve Buberl" />
+  <meta name="Language" content="en" />
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <meta http-equiv="Content-Language" content="en" />
+  <link rev="made" href="mailto:sbuberl@gmail.com" />
+  <link rel="StyleSheet" href="/screen.css" type="text/css" media="screen" />
+  <link rel="StyleSheet" href="/print.css" type="text/css" media="print" />
+  <script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
+</head>
+
+<body>
+
+<!-- For non-visual or non-stylesheet-capable user agents -->
+<div id="mainlink"><a href="#main">Skip to main content.</a></div>
+
+
+<!-- ======== Header ======== -->
+
+<div id="header">
+  <div class="left">
+    <a href="/index.php"><img src="/fSQL.png" alt="Flat-File SQL" height="60" width="375" /></a>
+  </div>
+
+  <div class="subheader">
+    <span class="hidden">Navigation:</span>
+    <a href="/home.html">Home</a> |
+    <a href="/docs/index.html">Documentation</a> |
+    <a href="/download.html">Downloads</a> |
+    <a href="/support.html">Support</a>
+  </div>
+</div>
+
+<div id="sidebar">
+  <div>
+
+    </ul>
+  </div>
+</div>
+
+
+<!-- ======== Main Content ======== -->
+
+<div id="main">
+
+<div id="navhead">
+  <hr />
+  <span class="hidden">Path to this page:</span>
+<?php
+	if($dirname !== '/' && count($pieces) > 0)
+	{
+		$fullpath = "";
+		foreach($pieces as $piece)
+		{
+			$fullpath .= "/$piece";
+			$top_menu_result = pg_query($conn, "SELECT menu_title FROM pages WHERE path='$fullpath'");
+			$top_menu_row = pg_fetch_row($top_menu_result);
+			echo "  <a href=\"$fullpath\">{$top_menu_row[0]}</a> &raquo;\n";
+		}
+		echo "  $menu_title\n";
+	}
+?>
+
+</div>

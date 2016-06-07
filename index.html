@@ -1,0 +1,101 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Flat-File SQL</title>
+  <meta name="Author" content="Steve Buberl, sbuberl@gmail.com" />
+  <meta name="Description" content="Home of Flat-File SQL" />
+  <meta name="Copyright" content="Copyright (C) 2006-2016, Steve Buberl" />
+  <meta name="Language" content="en" />
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <meta http-equiv="Content-Language" content="en" />
+  <link rev="made" href="mailto:sbuberl@gmail.com" />
+  <link rel="stylesheet" href="style.css" type="text/css" />
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous" />
+  <script type="text/javascript" src="https://code.jquery.com/jquery-latest.min.js" ></script>
+  <script type="text/javascript">
+
+    function setPage() {
+      var path = "home";
+      var sideBar = "sidebar";
+      var clickedTop = "home";
+      if(window.location.hash) {
+        path = window.location.hash.substr(1).replace(/_/g, "/");
+        var length = path.length;
+        var slash = path.lastIndexOf('/');
+        if(slash != -1) {
+          var dir = path.substr(0, slash + 1);
+          sideBar = dir + "sidebar";
+          clickedTop = dir.substr(0, dir.length - 1);
+        } else {
+          clickedTop = path;
+        }
+      }
+
+      $('#main').load(path + ".html");
+      $('#sidebar').load(sideBar + ".html");
+
+      $('.nav li.active').removeClass('active');
+      $('#' + clickedTop + "Nav").addClass("active");
+    }
+
+    $(window).load(function() {
+      window.onhashchange = setPage;
+      setPage();
+    });
+  </script>
+</head>
+
+<body>
+
+<!-- For non-visual or non-stylesheet-capable user agents -->
+<div id="mainlink"><a href="#main">Skip to main content.</a></div>
+
+
+<!-- ======== Header ======== -->
+
+<div class="container-fluid">
+
+    <div class="row" id="header">
+      <div class="col-md-12" style="margin-left: -15px;">
+        <a href="index.html"><img src="fSQL.png" alt="Flat-File SQL" height="60" width="375" /></a>
+      </div>
+    </div>
+
+      <div class="subheader row">
+        <div class="col-md-12">
+            <ul class="nav nav-tabs">
+              <li id="homeNav" role="presentation" class="active"><a class="nav-click" href="#home">Home</a></li>
+              <li id="docsNav" role="presentation"><a class="nav-click" href="#docs_index">Documentation</a></li>
+              <li id="downloadNav" role="presentation"><a class="nav-click" href="#download">Downloads</a></li>
+              <li id="supportNav" role="presentation"><a class="nav-click" href="#support">Support</a></li>
+            </ul>
+        </div>
+      </div>
+
+    <div class="row">
+        <div class="col-md-3 col-md-2" id="sidebar">
+        </div>
+
+        <div id="main" class="col-md-9 col-md-10" >
+
+          <div id="navhead">
+            <hr />
+            <span class="hidden">Path to this page:</span>
+          </div>
+
+        </div>
+    </div>
+
+
+    <!-- ======== Footer ======== -->
+
+    <div class="row">
+      <div class="col-md-12"id="footer">
+          Copyright &copy; 2006-2016, Steve Buberl.  All rights reserved.
+      </div>
+    </div>
+</div>
+
+</body>
+</html>

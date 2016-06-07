@@ -1,0 +1,163 @@
+
+#header {			/* Warning: not printed out on paper */
+   color:           #003399;
+   background:      #7a9ce5;
+}
+
+#header a:link,
+#header a:visited {
+   color:           #003399;
+   background:      transparent;
+}
+
+#header .highlight,
+#header a.highlight:link,
+#header a.highlight:visited {
+   color:           white;
+   background:      transparent;
+}
+
+
+#subheader {
+   color:           white;
+   background:      #003399;
+   margin:          0;
+   padding:         0.25em 1.5em 0.5em 0.5em; /* For IE/Win */
+}
+
+#subheader a:link,
+#subheader a:visited {
+   font-weight:     bolder;
+   color:           white;
+   background:      transparent;
+   margin:          0;
+   padding:         0 0.5em;
+}
+
+#subheader a.highlight,
+#subheader a.highlight:link,
+#subheader a.highlight:visited {
+   color:           #FDA05E;
+   background:      transparent;
+}
+
+#sidebar {			/* Warning: not printed out on paper */
+   border-right:    1px solid #999999;
+}
+
+#sidebar div {
+   font-size:       95%;
+   text-align:      left;
+   margin:          0;
+   padding:         0.5em 1em;
+   border-bottom:   1px solid #999999;
+}
+
+#sidebar p {
+   margin:          0.5em 0;
+}
+
+#sidebar .title a:link,
+#sidebar .title a:visited {
+   color:           black;
+   background:      transparent;
+}
+
+#sidebar ul {
+   list-style:      none outside;
+   margin:          0.5em 0;
+   padding:         0;
+}
+
+#sidebar ul li {
+   margin:          0;
+   padding:         0.125em 0;
+}
+
+#sidebar ul li.highlight {
+   color:           inherit;
+   background:      white;
+   margin-left:     -1em;
+   margin-right:    -1em;
+   padding-left:    1em;
+   border-top:      1px solid #999999;
+   border-bottom:   1px solid #999999;
+}
+
+#sidebar ul li.highlight a:link,
+#sidebar ul li.highlight a:visited {
+   color:           black;
+   background:      transparent;
+}
+
+#main {
+   text-align:      justify;
+   line-height:     1.5;
+   color:           black;
+   background:      white;
+   margin:          0 0 0 0em;
+   padding:         0.25em 1.5em 0.5em 1em;
+   border-left:     1px solid #999999;
+}
+
+#main h1 {			/* Should be used once, following navhead */
+   color:           #999999;
+   background:      transparent;
+   margin:          0 0 0.5em 0;
+}
+
+#main .highlight {		/* Highlight box (for warnings, etc) */
+   color:           inherit;
+   background:      #F0F0F0;
+   margin:          1em 0;
+   padding:         1em 2.5em;
+   border:          1px solid #999999;
+}
+
+#footer {
+   font-size:       90%;
+   text-align:      center;
+   color:           white;
+   background:      #6381DC;
+   margin:          0;
+   padding:         0.5em 1.67em 0.5em 1.67em;
+}
+
+#mainlink {			/* "Skip to main content" link */
+   display:         none !important;
+}
+
+.floatbox {
+   overflow:        visible;
+   font-size:       95%;
+   line-height:     1.25;
+   margin:          0 0 0.75em 1.5em;
+   padding:         0.5em 1em;
+   border:          1px solid #999999;
+   float:           right;
+   clear:           right;
+   color:           black;
+   background:      #F0F0F0;
+   width:           35%;
+}
+
+.floatbox hr {
+   display:         none !important;
+}
+
+.floatbox p,
+.navbox p {
+   margin:          0.75em 0;
+   padding:         0;
+}
+
+#main .floatbox .highlight {
+   color:           inherit;
+   background:      white;
+   margin:          0.75em 0;
+   padding:         0.75em 1.5em;
+}
+
+.title {
+   font-weight:     bolder;
+}
